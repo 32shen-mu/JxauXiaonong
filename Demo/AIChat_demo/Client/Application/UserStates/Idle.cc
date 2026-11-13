@@ -1,4 +1,5 @@
 #include "Idle.h"
+#include "Speaking.h"
 #include "../../Utils/user_log.h"
 #include "../../third_party/snowboy/include/snowboy-detect-c-wrapper.h"
 #include "../../Events/AppEvents.h"
@@ -59,6 +60,7 @@ void IdleState::Exit(Application* app) {
         app->audio_processor_.addFrameToPlaybackQueue(frame);
         audioQueue.pop();
     }
+    SpeakingState::MarkWakeResponse();   // 告诉 Speaking: 这一轮播的是唤醒应答, 才需要回声保护窗口
     app->set_tts_completed(true);
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     USER_LOG_INFO("Idle State exit.");

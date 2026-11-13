@@ -13,12 +13,16 @@ public:
     static void Exit(Application* app);
     // 播报期间持续跑唤醒词检测, 实现"说话打断"(barge-in)
     static void RunInterruptDetection(Application* app);
+    // 由 Idle::Exit 调用: 标记"接下来这一轮播的是唤醒应答", 只有这一轮才需要回声保护窗口
+    static void MarkWakeResponse();
 private:
     static std::atomic<bool> state_running_;       // 静态成员变量：运行状态标志
     static std::thread state_running_thread_;      // 静态成员变量：运行线程
     static std::atomic<bool> interrupt_running_;   // 打断检测线程运行标志
     static std::thread interrupt_thread_;          // 打断检测线程
     static std::atomic<long long> start_tick_ms_;  // 进入本状态的时刻, 用于跳过外放回声窗口
+    static std::atomic<bool> wake_response_pending_; // 本轮是否为唤醒应答(而非回复 TTS)
+    static std::atomic<long long> guard_ms_;         // 本轮生效的回声保护窗口(ms)
 };
 
 #endif // SPEAKING_STATE_H
